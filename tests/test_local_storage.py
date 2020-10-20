@@ -2,6 +2,7 @@ import pathlib
 import pytest
 import subprocess
 
+from mara_storage.compression import Compression, compressor, file_extension as compression_file_extension
 from mara_storage import storages, info, shell, manage
 
 
@@ -28,17 +29,35 @@ def test_read_file_command(storage: object):
 
     # prepare
     file_path = storage.base_path / TEST_READ_FILE_NAME
+    compressions = [
+        Compression.NONE,
+        Compression.ZIP,
+        Compression.GZIP,
+        Compression.TAR_GZIP]
+
     (exitcode, _) = subprocess.getstatusoutput(f'echo "{TEST_CONTENT}" > {file_path}')
     assert exitcode == 0
     assert file_path.is_file()
 
-    # test
-    command = shell.read_file_command(storage, file_name=TEST_READ_FILE_NAME)
-    assert command
+    for compression in compressions:
+        if compression == Compression.NONE:
+            continue
+        file_extension = compression_file_extension(compression)
+        (exitcode, _) = subprocess.getstatusoutput(f'{compressor(compression)} {file_path} > {file_path}.{file_extension}')
+        assert exitcode == 0
+        assert file_path.is_file()
 
-    (exitcode, stdout) = subprocess.getstatusoutput(command)
-    assert exitcode == 0
-    assert stdout == TEST_CONTENT
+    # test
+    for compression in compressions:
+        print(f'Test compression: {compression}')
+        file_extension = compression_file_extension(compression)
+        file_extension = f'.{file_extension}' if file_extension else ''
+        command = shell.read_file_command(storage, file_name=f'{TEST_READ_FILE_NAME}{file_extension}', compression=compression)
+        assert command
+
+        (exitcode, stdout) = subprocess.getstatusoutput(command)
+        assert exitcode == 0
+        assert stdout == TEST_CONTENT
 
 
 def test_write_file_command(storage: object):
