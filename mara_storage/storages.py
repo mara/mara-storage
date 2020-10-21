@@ -30,3 +30,20 @@ class LocalStorage(Storage):
         Connection information for a local path data bucket
         """
         self.base_path = base_path
+
+
+class GoogleCloudStorage(Storage):
+    def __init__(self, bucket_name: str, project_id: str = None):
+        """
+        Connection information for a Google Cloud Storage bucket
+
+        Args:
+            bucket_name: name of the GCS bucket
+            project_id: Google Cloud project ID for new buckets
+        """
+        self.bucket_name = bucket_name
+        self.project_id = project_id
+    
+    @property
+    def base_uri(self):
+        return f'gs://{self.bucket_name}'

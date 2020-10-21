@@ -36,6 +36,13 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
     return f'{uncompressor(compression)} '+shlex.quote(str( (storage.base_path / file_name).absolute() ))
 
 
+@read_file_command.register(storages.GoogleCloudStorage)
+def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE):
+    return (f'gsutil cat '
+            + shlex.quote(f'{storage.base_uri}/{file_name}')
+            + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -65,6 +72,16 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
     if compression not in [Compression.NONE]:
         ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
     return 'cat - > ' + shlex.quote(str( (storage.base_path / file_name).absolute() ))
+
+
+@write_file_command.register(storages.GoogleCloudStorage)
+def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE):
+    if compression not in [Compression.NONE, Compression.GZIP]:
+        ValueError(f'Only compression NONE and GZIP is supported from storage type "{storage.__class__.__name__}"')
+    return (f'gsutil cp '
+            + ('-Z ' if compression == Compression.GZIP else '')
+            + '- '
+            + shlex.quote(f'{storage.base_uri}/{file_name}'))
 
 
 # -----------------------------------------------------------------------------
@@ -100,3 +117,10 @@ def __(storage: storages.LocalStorage, file_name: str, force: bool = True):
     return ('rm '
             + ('-f ' if force else '')
             + shlex.quote(str( (storage.base_path / file_name).absolute() )))
+
+
+@delete_file_command.register(storages.GoogleCloudStorage)
+def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True):
+    return ('gsutil rm '
+            + ('-f ' if force else '')
+            + shlex.quote(f'{storage.uri}/{file_name}'))

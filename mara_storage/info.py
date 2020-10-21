@@ -22,3 +22,15 @@ def __(alias: str, file_name: str):
 @file_exists.register(storages.LocalStorage)
 def __(storage: storages.LocalStorage, file_name: str):
     return (storage.base_path.absolute() / file_name).is_file()
+
+
+@file_exists.register(storages.GoogleCloudStorage)
+def __(storage: storages.GoogleCloudStorage, file_name: str):
+    import shlex
+    import subprocess
+
+    command = (f'gsutil -q stat '
+               + shlex.quote(f'{storage.base_uri}/{file_name}'))
+
+    (exitcode, _) = subprocess.getstatusoutput(command)
+    return exitcode == 0

@@ -20,6 +20,25 @@ def __(storage: storages.LocalStorage):
     storage.base_path.mkdir(parents=True, exist_ok=True)
 
 
+@ensure_storage.register(storages.GoogleCloudStorage)
+def __(storage: storages.GoogleCloudStorage):
+    import shlex
+    import subprocess
+
+    # command returning 0 when storage exists
+    test_exists_command = f'gsutil -q ls {shlex.quote(storage.base_uri)}'
+
+    # command returning 0 when bucket was created
+    create_storage_command = (f'gsutil mb '
+                              + (f'-p {storage.project_id} ' if storage.project_id else '')
+                              + shlex.quote(storage.base_uri))
+
+    (exitcode, stdout) = subprocess.getstatusoutput(f'{test_exists_command} || {create_storage_command}')
+    if exitcode != 0:
+        raise Exception(f'An error occured while creating a GCS bucket. Stdout:\n{stdout}')
+    assert exitcode == 0
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -51,3 +70,18 @@ def __(storage: storages.LocalStorage, force: bool = False):
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(storage.base_path.absolute))
 
         storage.base_path.rmdir()
+
+
+@drop_storage.register(storages.GoogleCloudStorage)
+def __(storage: storages.GoogleCloudStorage, force: bool = False):
+    import shlex
+    import subprocess
+
+    command = (f'gsutil '
+               + ('rm -r ' if force else 'rb -f ')
+               + shlex.quote(storage.base_uri))
+
+    (exitcode, stdout) = subprocess.getstatusoutput(command)
+    if exitcode != 0:
+        raise Exception(f'An error occured while dropping a GCS bucket. Stdout:\n{stdout}')
+    assert exitcode == 0
