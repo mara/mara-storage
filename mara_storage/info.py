@@ -2,7 +2,6 @@
 
 from functools import singledispatch
 import os
-import typing
 
 from mara_storage import storages, config
 

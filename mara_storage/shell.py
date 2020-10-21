@@ -91,8 +91,8 @@ def delete_file_command(storage: object, file_name: str, force: bool = True) -> 
 
 
 @delete_file_command.register(str)
-def __(alias: str, file_name: str):
-    return delete_file_command(storages.storage(alias), file_name=file_name)
+def __(alias: str, file_name: str, force: bool = True):
+    return delete_file_command(storages.storage(alias), file_name=file_name, force=force)
 
 
 @delete_file_command.register(storages.LocalStorage)
