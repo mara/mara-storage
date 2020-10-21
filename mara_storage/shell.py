@@ -64,7 +64,7 @@ def __(alias: str, file_name: str, compression: Compression = Compression.NONE):
 def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
     if compression not in [Compression.NONE]:
         ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
-    return shlex.quote(str( (storage.base_path / file_name).absolute() ))
+    return 'cat - > ' + shlex.quote(str( (storage.base_path / file_name).absolute() ))
 
 
 # -----------------------------------------------------------------------------

@@ -69,7 +69,7 @@ def test_write_file_command(storage: object):
     command = shell.write_file_command(storage, file_name=TEST_WRITE_FILE_NAME)
     assert command
 
-    (exitcode, _) = subprocess.getstatusoutput(f'echo "{TEST_CONTENT}" > {command}')
+    (exitcode, _) = subprocess.getstatusoutput(f'echo "{TEST_CONTENT}" | {command}')
     assert exitcode == 0
 
     assert file_path.is_file()
