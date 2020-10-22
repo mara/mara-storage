@@ -22,3 +22,14 @@ def __(alias: str, file_name: str):
 @file_exists.register(storages.LocalStorage)
 def __(storage: storages.LocalStorage, file_name: str):
     return (storage.base_path.absolute() / file_name).is_file()
+
+
+@file_exists.register(storages.HadoopStorage)
+def __(storage: storages.LocalStorage, file_name: str):
+    import subprocess
+
+    command = (f'hadoop -test -f '
+               + storage.build_uri(file_name=file_name))
+
+    (exitcode, _) = subprocess.getstatusoutput(command)
+    return exitcode == 0

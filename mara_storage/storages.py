@@ -2,6 +2,7 @@
 
 import functools
 import pathlib
+import urllib.parse
 
 
 @functools.lru_cache(maxsize=None)
@@ -30,3 +31,15 @@ class LocalStorage(Storage):
         Connection information for a local path data bucket
         """
         self.base_path = base_path
+
+
+class HadoopStorage(Storage):
+    def __init__(self, name_node_host: str, port: int = None):
+        self.name_node_host = name_node_host
+        self.port = port
+    
+    def build_uri(self, file_name: str) -> str:
+        return (f'hdfs://{self.name_node_host}'
+                + (f':{self.port}' if self.port else '')
+                + '/'
+                + urllib.parse.quote(file_name))

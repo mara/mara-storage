@@ -36,6 +36,14 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
     return f'{uncompressor(compression)} '+shlex.quote(str( (storage.base_path / file_name).absolute() ))
 
 
+@read_file_command.register(storages.HadoopStorage)
+def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
+    # consider using 'hadoop fs -text' for supported compressions
+    return ('hadoop fs -cat '
+            + storage.build_uri(file_name=file_name)
+            + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -65,6 +73,13 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
     if compression not in [Compression.NONE]:
         ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
     return 'cat - > ' + shlex.quote(str( (storage.base_path / file_name).absolute() ))
+
+
+@write_file_command.register(storages.LocalStorage)
+def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
+    if compression not in [Compression.NONE]:
+        ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
+    return 'hadoop fs -put - ' + storage.build_uri(file_name=file_name)
 
 
 # -----------------------------------------------------------------------------
@@ -100,3 +115,10 @@ def __(storage: storages.LocalStorage, file_name: str, force: bool = True):
     return ('rm '
             + ('-f ' if force else '')
             + shlex.quote(str( (storage.base_path / file_name).absolute() )))
+
+
+@delete_file_command.register(storages.HadoopStorage)
+def __(storage: storages.HadoopStorage, file_name: str, force: bool = True):
+    return ('hadoop fs -rm '
+            + ('-f ' if force else '')
+            + storage.build_uri(file_name=file_name))
