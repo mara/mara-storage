@@ -17,5 +17,4 @@ class LocalStorageClient(StorageClient):
 
     def iterate_files(self, file_pattern: str):
         for file in glob.iglob(str(self._storage.base_path / file_pattern)):
-            file = str(pathlib.Path(file).relative_to(self._storage.base_path))
-            yield file
+            yield str(pathlib.Path(file).relative_to(self._storage.base_path))

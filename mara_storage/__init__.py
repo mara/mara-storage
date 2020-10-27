@@ -19,7 +19,7 @@ def MARA_ACL_RESOURCES():
 
 
 def MARA_CLICK_COMMANDS():
-    import cli
+    from . import cli
     return [
         cli.ensure_storage,
         cli.drop_storage]
