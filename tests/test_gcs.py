@@ -15,7 +15,7 @@ TEST_CONTENT = 'THIS IS A TEST CONTENT'
 
 
 if not GCS_PROJECT_ID:
-    pytest.skip("skipping GCS tests; variable GCS_PROJECT_ID not set in tests/local_config.py", allow_module_level=True)
+    pytest.skip("skipping GCS tests: variable GCS_PROJECT_ID not set in tests/local_config.py", allow_module_level=True)
 
 
 @pytest.fixture

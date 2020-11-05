@@ -30,7 +30,7 @@ def __(storage: storages.GoogleCloudStorage, file_name: str):
     import subprocess
 
     command = (f'gsutil -q stat '
-               + shlex.quote(f'{storage.base_uri}/{file_name}'))
+               + storage.build_uri(file_name))
 
     (exitcode, _) = subprocess.getstatusoutput(command)
     return exitcode == 0

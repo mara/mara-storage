@@ -30,6 +30,7 @@ def __(storage: storages.GoogleCloudStorage):
 
     # command returning 0 when bucket was created
     create_storage_command = (f'gsutil mb '
+                              + (f'-l {storage.location}' if storage.location else '')
                               + (f'-p {storage.project_id} ' if storage.project_id else '')
                               + shlex.quote(storage.base_uri))
 

@@ -48,6 +48,11 @@ def __(storage: storages.LocalStorage):
     from .local_storage import LocalStorageClient
     return LocalStorageClient
 
+@storage_client_type.register(storages.GoogleCloudStorage)
+def __(storage: storages.GoogleCloudStorage):
+    from .google_cloud_storage import GoogleCloudStorageClient
+    return GoogleCloudStorageClient
+
 
 """ DEPRECATED """
 @singledispatch

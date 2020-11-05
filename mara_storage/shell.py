@@ -39,7 +39,7 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
 @read_file_command.register(storages.GoogleCloudStorage)
 def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE):
     return (f'gsutil cat '
-            + shlex.quote(f'{storage.base_uri}/{file_name}')
+            + storage.build_uri(file_name)
             + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
 
 
@@ -81,7 +81,7 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compre
     return (f'gsutil cp '
             + ('-Z ' if compression == Compression.GZIP else '')
             + '- '
-            + shlex.quote(f'{storage.base_uri}/{file_name}'))
+            + storage.build_uri(file_name))
 
 
 # -----------------------------------------------------------------------------
