@@ -4,7 +4,8 @@ import pytest
 import subprocess
 
 from mara_storage.compression import Compression, compressor, file_extension as compression_file_extension
-from mara_storage import client, storages, info, shell, manage
+from mara_storage.client import StorageClient
+from mara_storage import storages, info, shell, manage
 
 
 TEST_TOUCH_FILE_NAME = 'empty-file.txt'
@@ -127,8 +128,10 @@ def test_last_modification_date(storage: object):
     assert file_path.is_file()
 
     #test
-    storage_client = client.init_client(storage)
+    storage_client = StorageClient(storage)
     assert storage_client
+    from mara_storage.local_storage import LocalStorageClient
+    assert isinstance(storage_client, LocalStorageClient)
 
     last_modification_date = storage_client.last_modification_timestamp(TEST_TOUCH_FILE_NAME)
     assert last_modification_date

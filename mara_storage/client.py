@@ -6,6 +6,21 @@ from mara_storage import storages
 
 class StorageClient:
     """A base class for a storage client"""
+    def __new__(cls, *args, **kwargs):
+        storage = None
+        if len(args) >= 1:
+            storage = args[0]
+        elif 'storage' in kwargs:
+            storage = kwargs.get('storage')
+        else:
+            raise ValueError('You have to pass the "storage" argument as first paramter when constructing StorageClient')
+
+        if cls is StorageClient:
+            cls = storage_client_type(storage)
+            return cls(storage)
+        else:
+            return super(StorageClient, cls).__new__(cls)
+
     def __init__(self, storage: object):
         self._storage = storage
 
@@ -24,8 +39,21 @@ class StorageClient:
 
 
 @singledispatch
+def storage_client_type(storage: object) -> StorageClient:
+    """Returns the client type for a storage configuration"""
+    raise NotImplementedError(f'Please implement storage_client_type for type "{storage.__class__.__name__}"')
+
+@storage_client_type.register(storages.LocalStorage)
+def __(storage: storages.LocalStorage):
+    from .local_storage import LocalStorageClient
+    return LocalStorageClient
+
+
+""" DEPRECATED """
+@singledispatch
 def init_client(storage: object) -> StorageClient:
     """Initiates a storage client for a storage configuration"""
+    raise NotImplementedError(f'Please implement init_client for type "{storage.__class__.__name__}"')
 
 @init_client.register(str)
 def __(alias: str) -> StorageClient:
