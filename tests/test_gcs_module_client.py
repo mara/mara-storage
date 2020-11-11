@@ -16,7 +16,7 @@ TEST_TOUCH_FILE_NAME = 'empty-file.txt'
 if not GCS_PROJECT_ID or not GCS_SERVICE_ACCOUNT_FILE:
     pytest.skip("skipping GCS tests: variable GCS_PROJECT_ID or GCS_SERVICE_ACCOUNT_FILE not set in tests/local_config.py", allow_module_level=True)
 
-if not importlib.util.find_spec('storage', package='google.cloud')::
+if not importlib.util.find_spec('storage', package='google.cloud'):
     pytest.skip("skipping GCS module client tests: module google.cloud.storage could not be found", allow_module_level=True)
 
 

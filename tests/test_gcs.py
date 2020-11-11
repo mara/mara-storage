@@ -43,3 +43,35 @@ def test_write_file_command(storage: object):
     assert exitcode == 0
 
     assert info.file_exists(storage, file_name=TEST_WRITE_FILE_NAME)
+
+
+def test_read_file_command(storage: object):
+    command = shell.write_file_command(storage, file_name=TEST_READ_FILE_NAME)
+    assert command
+
+    (exitcode, _) = subprocess.getstatusoutput(f'echo "{TEST_CONTENT}" | {command}')
+    assert exitcode == 0
+    assert info.file_exists(storage, file_name=TEST_READ_FILE_NAME)
+
+    command = shell.read_file_command(storage, file_name=TEST_READ_FILE_NAME)
+    assert command
+
+    (exitcode, stdout) = subprocess.getstatusoutput(command)
+    assert exitcode == 0
+    assert stdout == TEST_CONTENT
+
+
+def test_delete_file_command(storage: object):
+    command = shell.write_file_command(storage, file_name=TEST_DELETE_FILE_NAME)
+    assert command
+
+    (exitcode, _) = subprocess.getstatusoutput(f'echo "{TEST_CONTENT}" | {command}')
+    assert exitcode == 0
+    assert info.file_exists(storage, file_name=TEST_DELETE_FILE_NAME)
+
+    command = shell.delete_file_command(storage, file_name=TEST_DELETE_FILE_NAME)
+    assert command
+
+    (exitcode, _) = subprocess.getstatusoutput(command)
+    assert exitcode == 0
+    assert not info.file_exists(storage, file_name=TEST_DELETE_FILE_NAME)

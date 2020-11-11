@@ -123,4 +123,4 @@ def __(storage: storages.LocalStorage, file_name: str, force: bool = True):
 def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True):
     return ('gsutil rm '
             + ('-f ' if force else '')
-            + shlex.quote(f'{storage.uri}/{file_name}'))
+            + storage.build_uri(file_name))
