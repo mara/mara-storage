@@ -1,9 +1,8 @@
 """Information functions for storage file/directory information"""
 
 from functools import singledispatch
-import os
 
-from mara_storage import storages, config
+from mara_storage import storages
 
 
 @singledispatch
@@ -26,10 +25,9 @@ def __(storage: storages.LocalStorage, file_name: str):
 
 @file_exists.register(storages.GoogleCloudStorage)
 def __(storage: storages.GoogleCloudStorage, file_name: str):
-    import shlex
     import subprocess
 
-    command = (f'gsutil -q stat '
+    command = ('gsutil -q stat '
                + storage.build_uri(file_name))
 
     (exitcode, _) = subprocess.getstatusoutput(command)

@@ -1,6 +1,7 @@
 import datetime
 import importlib.util
 import subprocess
+import typing as t
 
 from mara_storage import storages
 from mara_storage.client import StorageClient
@@ -19,7 +20,7 @@ class GoogleCloudStorageClient(StorageClient):
                 cls = GoogleCloudStorageShellClient
             return cls(storage)
         else:
-            return super(GoogleCloudStorageClient, cls).__new__(cls, storage)       
+            return super(GoogleCloudStorageClient, cls).__new__(cls, storage)
 
     def __init__(self, storage: storages.GoogleCloudStorage):
         super().__init__(storage)
@@ -63,10 +64,6 @@ class GoogleCloudStorageModuleClient(GoogleCloudStorageClient):
 
 
 class GoogleCloudStorageShellClient(GoogleCloudStorageClient):
-    def __init__(self, storage: storages.GoogleCloudStorage):
-        super().__init__(storage)
-
-
     def last_modification_timestamp(self, path: str) -> datetime.datetime:
         #raise NotImplementedError()
         command = (f"gsutil stat {self._storage.build_uri(path)} | \\\n"
@@ -76,19 +73,21 @@ class GoogleCloudStorageShellClient(GoogleCloudStorageClient):
         (exitcode, stdout) = subprocess.getstatusoutput(command)
 
         if exitcode != 0:
-            return None
+            raise Exception('An error occured while getting the last modification time of a file' +
+                            f' in a GCS bucket. Stdout:\n{stdout}')
 
         # NOTE: There is a known issue that python does not read the timezone when using
         #       datetime.strptime with parameter '%Z'. When the local timezone is different
         #       as the GCS timezone, you might run into issues with this.
         return datetime.datetime.strptime(stdout, '%a, %d %b %Y %H:%M:%S %Z').astimezone()
 
-    def iterate_files(self, file_pattern: str):
+    def iterate_files(self, file_pattern: str) -> t.Iterator[str]:
         command = (f"gsutil ls {self._storage.build_uri(file_pattern)}")
         (exitcode, stdout) = subprocess.getstatusoutput(command)
 
         if exitcode != 0:
-            return None
+            raise Exception('An error occured while iterating over files in a GCS bucket.' +
+                            f' Stdout:\n{stdout}')
 
         for file in stdout.split('\n'):
             if file:

@@ -1,6 +1,4 @@
 """Configuration of storage connections"""
-import pathlib
-import typing
 
 import mara_storage.storages
 

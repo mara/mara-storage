@@ -1,10 +1,11 @@
 from functools import singledispatch
 import datetime
+import typing as t
 
 from mara_storage import storages
 
 
-class StorageClient:
+class StorageClient():
     """A base class for a storage client"""
     def __new__(cls, storage: object):
         if storage is None:
@@ -23,10 +24,10 @@ class StorageClient:
         """Returns the last modification timestamp for a object (path or file) on a storage"""
         raise NotImplementedError(f'Please implement last_modification_timestamp for type "{self._storage.__class__.__name__}"')
 
-    def iterate_files(self, file_pattern: str):
+    def iterate_files(self, file_pattern: str) -> t.Iterator[str]:
         """
         Iterates over files on on a storage
-        
+
         Args:
             file_pattern: the file pattern, e.g. 'subfolder/*.csv'
         """

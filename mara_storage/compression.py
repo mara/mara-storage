@@ -28,14 +28,14 @@ def compressor(compression: Compression) -> str:
 
     Args:
         compression: the compression to be used
-    
+
     Returns:
         The compress command without the files to be compressed
     """
     if compression not in [Compression.ZIP, Compression.GZIP, Compression.TAR_GZIP]:
         ValueError('The arg compression must be of enum value ZIP, GZIP or TAR_GZIP')
 
-    return {Compression.ZIP: f'zip -',
+    return {Compression.ZIP: 'zip -',
             Compression.GZIP: 'gzip -c',
             Compression.TAR_GZIP: 'tar -czf -'}[compression]
 

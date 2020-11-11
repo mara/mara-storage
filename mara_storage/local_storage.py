@@ -2,6 +2,7 @@ import datetime
 import glob
 import os
 import pathlib
+import typing as t
 
 from mara_storage import storages
 from mara_storage.client import StorageClient
@@ -15,6 +16,6 @@ class LocalStorageClient(StorageClient):
         return datetime.datetime.fromtimestamp(
             os.path.getmtime(self._storage.base_path.absolute() / path)).astimezone()
 
-    def iterate_files(self, file_pattern: str):
+    def iterate_files(self, file_pattern: str)-> t.Iterator[str]:
         for file in glob.iglob(str(self._storage.base_path / file_pattern)):
             yield str(pathlib.Path(file).relative_to(self._storage.base_path))
