@@ -6,14 +6,9 @@ from mara_storage import storages
 
 class StorageClient:
     """A base class for a storage client"""
-    def __new__(cls, *args, **kwargs):
-        storage = None
-        if len(args) >= 1:
-            storage = args[0]
-        elif 'storage' in kwargs:
-            storage = kwargs.get('storage')
-        else:
-            raise ValueError('You have to pass the "storage" argument as first paramter when constructing StorageClient')
+    def __new__(cls, storage: object):
+        if storage is None:
+            raise ValueError('Please provide the storage prameter')
 
         if cls is StorageClient:
             cls = storage_client_type(storage)
@@ -39,9 +34,13 @@ class StorageClient:
 
 
 @singledispatch
-def storage_client_type(storage: object) -> StorageClient:
+def storage_client_type(storage: object):
     """Returns the client type for a storage configuration"""
     raise NotImplementedError(f'Please implement storage_client_type for type "{storage.__class__.__name__}"')
+
+@storage_client_type.register(str)
+def __(alias: str) -> StorageClient:
+    return storage_client_type(storages.storage(alias))
 
 @storage_client_type.register(storages.LocalStorage)
 def __(storage: storages.LocalStorage):
@@ -52,19 +51,3 @@ def __(storage: storages.LocalStorage):
 def __(storage: storages.GoogleCloudStorage):
     from .google_cloud_storage import GoogleCloudStorageClient
     return GoogleCloudStorageClient
-
-
-""" DEPRECATED """
-@singledispatch
-def init_client(storage: object) -> StorageClient:
-    """Initiates a storage client for a storage configuration"""
-    raise NotImplementedError(f'Please implement init_client for type "{storage.__class__.__name__}"')
-
-@init_client.register(str)
-def __(alias: str) -> StorageClient:
-    return init_client(storages.storage(alias))
-
-@init_client.register(storages.LocalStorage)
-def __(storage: storages.LocalStorage):
-    from .local_storage import LocalStorageClient
-    return LocalStorageClient(storage)

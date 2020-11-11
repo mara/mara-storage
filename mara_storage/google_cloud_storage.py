@@ -7,15 +7,25 @@ from mara_storage.client import StorageClient
 
 
 class GoogleCloudStorageClient(StorageClient):
-    def __new__(self, storage: storages.GoogleCloudStorage):
-        if importlib.util.find_spec('storage', package='google.cloud'):
-            return GoogleCloudStorageModuleClient(storage)
+    def __new__(cls, storage: storages.GoogleCloudStorage):
+        if storage is None:
+            raise ValueError('Parameter storage is required')
+
+        if cls is GoogleCloudStorageClient:
+            if importlib.util.find_spec('storage', package='google.cloud'):
+                cls = GoogleCloudStorageModuleClient
+            else:
+                # fallback client using 'gsutil' shell command
+                cls = GoogleCloudStorageShellClient
+            return cls(storage)
         else:
-            # fallback client using 'gsutil' module
-            return GoogleCloudStorageShellClient(storage)
+            return super(GoogleCloudStorageClient, cls).__new__(cls, storage)       
+
+    def __init__(self, storage: storages.GoogleCloudStorage):
+        super().__init__(storage)
 
 
-class GoogleCloudStorageModuleClient(StorageClient):
+class GoogleCloudStorageModuleClient(GoogleCloudStorageClient):
     def __init__(self, storage: storages.GoogleCloudStorage):
         super().__init__(storage)
 
@@ -52,7 +62,7 @@ class GoogleCloudStorageModuleClient(StorageClient):
                 yield blob
 
 
-class GoogleCloudStorageShellClient(StorageClient):
+class GoogleCloudStorageShellClient(GoogleCloudStorageClient):
     def __init__(self, storage: storages.GoogleCloudStorage):
         super().__init__(storage)
 
