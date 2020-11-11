@@ -51,7 +51,7 @@ def test_last_modification_date(storage: object):
     assert storage_client
 
     last_modification_date = storage_client.last_modification_timestamp(TEST_TOUCH_FILE_NAME)
-    print(last_modification_date)
+
     assert last_modification_date
     assert isinstance(last_modification_date, datetime.datetime)
     assert (datetime.datetime.now().astimezone() - last_modification_date).total_seconds() <= 10
