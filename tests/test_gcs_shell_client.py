@@ -51,4 +51,5 @@ def test_last_modification_date(storage: object):
 
     assert last_modification_date
     assert isinstance(last_modification_date, datetime.datetime)
+    assert last_modification_date.tzinfo
     assert (datetime.datetime.now().astimezone() - last_modification_date).total_seconds() <= 10
