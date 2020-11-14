@@ -53,7 +53,7 @@ class GoogleCloudStorageModuleClient(GoogleCloudStorageClient):
         bucket = self._client.bucket(self._storage.bucket_name)
         blob = bucket.get_blob(path)
 
-        return blob.updated ## TODO need to test if the type and timezone is right here!
+        return blob.updated
 
     def iterate_files(self, file_pattern: str):
         blobs = self._client.list_blobs(self._storage.bucket_name, prefix=file_pattern)
@@ -65,7 +65,6 @@ class GoogleCloudStorageModuleClient(GoogleCloudStorageClient):
 
 class GoogleCloudStorageShellClient(GoogleCloudStorageClient):
     def last_modification_timestamp(self, path: str) -> datetime.datetime:
-        #raise NotImplementedError()
         command = (f"gsutil stat {self._storage.build_uri(path)} | \\\n"
                     + "grep 'Update time:' | \\\n"
                     + "sed 's/Update time://g' | \\\n"
