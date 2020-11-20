@@ -64,7 +64,7 @@ def write_file_command(storage: object, file_name: str, compression: Compression
 
 @write_file_command.register(str)
 def __(alias: str, file_name: str, compression: Compression = Compression.NONE):
-    return write_file_command(storages.storage, file_name=file_name, compression=compression)
+    return write_file_command(storages.storage(alias), file_name=file_name, compression=compression)
 
 
 @write_file_command.register(storages.LocalStorage)

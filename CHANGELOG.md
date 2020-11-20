@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.3 (2020-11-20)
+
+- fix write_file_command when using storage alias
+
 ## 0.9.2 (2020-11-11)
 
 - support alias call for `client.StorageClient`, remove `client.init_client`
