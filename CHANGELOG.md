@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.4 (2021-07-10)
+
+- fix ValueError exception was not thrown when compression was used in write_file_command
+
 ## 0.9.3 (2020-11-20)
 
 - fix write_file_command when using storage alias
