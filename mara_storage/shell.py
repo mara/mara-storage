@@ -80,7 +80,8 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
         else:
             zip_file_name = full_path.name
 
-        return f'(zip {shlex.quote(str( full_path ))} - && printf "@ -\\n@={shlex.quote(zip_file_name)}\\n" | zipnote -w {shlex.quote(str( full_path ))})'
+        return f'(zip {shlex.quote(str( full_path ))} - \\\n' \
+               + f'     && printf "@ -\\n@={shlex.quote(zip_file_name)}\\n" | zipnote -w {shlex.quote(str( full_path ))})'
     else:
         return 'cat - > ' + shlex.quote(str( full_path ))
 
