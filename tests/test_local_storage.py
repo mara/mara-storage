@@ -80,16 +80,26 @@ def test_read_file_command(storage: object):
 def test_write_file_command(storage: object):
     assert isinstance(storage, storages.LocalStorage)
 
+    # prepare
     file_path = storage.base_path / TEST_WRITE_FILE_NAME
+    compressions = [
+        Compression.NONE,
+        Compression.ZIP]
 
     assert storage.base_path
-    command = shell.write_file_command(storage, file_name=TEST_WRITE_FILE_NAME)
-    assert command
 
-    (exitcode, _) = subprocess.getstatusoutput(f'echo "{TEST_CONTENT}" | {command}')
-    assert exitcode == 0
+    # test
+    for compression in compressions:
+        print(f'Test compression: {compression}')
+        file_extension = compression_file_extension(compression)
+        file_extension = f'.{file_extension}' if file_extension else ''
+        command = shell.write_file_command(storage, file_name=f'{TEST_WRITE_FILE_NAME}{file_extension}', compression=compression)
+        assert command
 
-    assert file_path.is_file()
+        (exitcode, _) = subprocess.getstatusoutput(f'echo "{TEST_CONTENT}" | {command}')
+        assert exitcode == 0
+
+        assert file_path.is_file()
 
 
 def test_delete_file_command(storage: object):
