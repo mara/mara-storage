@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0
+
+- adding support to write piped data in ZIP compression to local storage
+- fix missing extra requirements for Google Cloud Storage
+
 ## 0.9.4 (2021-07-10)
 
 - fix ValueError exception was not thrown when compression was used in write_file_command
