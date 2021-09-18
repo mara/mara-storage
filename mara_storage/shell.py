@@ -6,7 +6,7 @@ Shell command generation for
 from functools import singledispatch
 import shlex
 
-from mara_storage.compression import Compression, uncompressor
+from mara_storage.compression import Compression, uncompressor, file_extension
 from mara_storage import storages
 
 
@@ -69,9 +69,21 @@ def __(alias: str, file_name: str, compression: Compression = Compression.NONE):
 
 @write_file_command.register(storages.LocalStorage)
 def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
-    if compression not in [Compression.NONE]:
-        raise ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
-    return 'cat - > ' + shlex.quote(str( (storage.base_path / file_name).absolute() ))
+    if compression not in [Compression.NONE, Compression.ZIP]:
+        raise ValueError(f'Only compression NONE and ZIP is supported from storage type "{storage.__class__.__name__}"')
+
+    full_path = (storage.base_path / file_name).absolute()
+    if compression == Compression.ZIP:
+        # the name which shall be used in the zip file
+        if full_path.suffix[1:] == file_extension(compression):
+            zip_file_name = full_path.stem
+        else:
+            zip_file_name = full_path.name
+
+        return f'(zip {shlex.quote(str( full_path ))} - \\\n' \
+               + f'     && printf "@ -\\n@={shlex.quote(zip_file_name)}\\n" | zipnote -w {shlex.quote(str( full_path ))})'
+    else:
+        return 'cat - > ' + shlex.quote(str( full_path ))
 
 
 @write_file_command.register(storages.GoogleCloudStorage)
