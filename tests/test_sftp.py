@@ -49,9 +49,7 @@ def test_file_exists(storage: object):
 
     # clean up test
     delete_command = shell.delete_file_command(storage, TEST_TOUCH_FILE_NAME)
-    print(delete_command)
-    (exitcode, t) = subprocess.getstatusoutput(delete_command)
-    print(t)
+    (exitcode, _) = subprocess.getstatusoutput(delete_command)
     assert exitcode == 0
 
 
@@ -80,7 +78,6 @@ def test_read_file_command(storage: object):
         assert command
 
         (exitcode, stdout) = subprocess.getstatusoutput(command)
-        print(stdout)
         assert exitcode == 0
         assert stdout == TEST_CONTENT
 
