@@ -43,3 +43,10 @@ def __(storage: storages.GoogleCloudStorage, file_name: str):
 
     (exitcode, _) = subprocess.getstatusoutput(command)
     return exitcode == 0
+
+
+@file_exists.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, file_name: str):
+    from . import azure
+    client = azure.init_client(storage, path=file_name)
+    return client.exists()

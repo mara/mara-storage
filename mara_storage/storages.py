@@ -85,3 +85,35 @@ class GoogleCloudStorage(Storage):
     def build_uri(self, path: str):
         """Returns a URI for a path on the storage"""
         return f"{self.base_uri}/{path}"
+
+class AzureStorage(Storage):
+    def __init__(self, account_name: str, container_name: str, sas: str, storage_type: str = 'blob'):
+        """
+        Connection information for a Azure sstorage bucket
+
+        Args:
+            account_name: The storage account name
+            container_name: The container name within the storage
+            storage_type: The storage type. Supports 'blob' or 'dfs'.
+            sas: The SAS token
+        """
+        self.account_name = account_name
+        self.container_name = container_name
+        self.storage_type = storage_type
+        if sas:
+            self.sas = sas[1:] if sas.startswith('?') else sas
+
+    @property
+    def base_uri(self):
+        return f'https://{self.account_name}.{self.storage_type}.core.windows.net/{self.container_name}'
+
+    def build_uri(self, path: str):
+        """Returns a URI for a path on the storage"""
+        if path and not path.startswith('/'):
+            path = '/' + path
+        return f"{self.base_uri}{path}?{self.sas}"
+
+    def connection_string(self):
+        return ('DefaultEndpointsProtocol=https'
+                + f';BlobEndpoint=https://{self.account_name}.{self.storage_type}.core.windows.net'
+                + f';SharedAccessSignature={self.sas}')

@@ -13,3 +13,9 @@ GCS_PROJECT_ID = ''
 
 # required for GCS client
 GCS_SERVICE_ACCOUNT_FILE = ''
+
+
+# the Azure Storage config used to perform the test
+AZ_STORAGE_ACCOUNT_NAME = ''
+AZ_STORAGE_TYPE = 'blob'
+AZ_STORAGE_SAS = None
