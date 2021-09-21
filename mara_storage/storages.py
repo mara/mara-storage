@@ -32,6 +32,30 @@ class LocalStorage(Storage):
         self.base_path = base_path
 
 
+class SftpStorage(Storage):
+    def __init__(self, host: str, port: int = None, user: str = None, password: str = None,
+        insecure: bool = False, identity_file: str = None, public_identity_file: str = None):
+        """
+        Connection information for a SFTP server
+
+        Args:
+            host: host name
+            port: tcp port
+            user: username
+            password: password
+            insecure: if True, the known_hosts file will not be checked
+            identity_file: path to a private key file to be used for private/public key authentication
+            public_identity_file: path to a public key file to be used for private/public key authentication
+        """
+        self.host = host
+        self.port = port
+        self.user = user
+        self.password = password
+        self.insecure = insecure
+        self.identity_file = identity_file
+        self.public_identity_file = public_identity_file
+
+
 class GoogleCloudStorage(Storage):
     def __init__(self, bucket_name: str, project_id: str = None, location: str = None,
         service_account_file: str = None, service_account_info: dict = None):
