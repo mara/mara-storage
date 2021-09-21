@@ -23,6 +23,13 @@ def __(storage: storages.LocalStorage, file_name: str):
     return (storage.base_path.absolute() / file_name).is_file()
 
 
+@file_exists.register(storages.SftpStorage)
+def __(storage: storages.SftpStorage, file_name: str):
+    from . import sftp
+    with sftp.connection(storage) as sftp:
+        return sftp.exists(file_name)
+
+
 @file_exists.register(storages.GoogleCloudStorage)
 def __(storage: storages.GoogleCloudStorage, file_name: str):
     import subprocess

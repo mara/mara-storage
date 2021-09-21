@@ -30,6 +30,7 @@ setup(
 
     extras_require={
         'test': ['pytest'],
+        'sftp': ['pysftp'],
         'google-cloud-storage': ['google-cloud-storage',
                                  'google-oauth']
     },
