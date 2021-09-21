@@ -43,6 +43,14 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compre
             + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
 
 
+@read_file_command.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, file_name: str, compression: Compression = Compression.NONE):
+    return ('azcopy cp '
+            + shlex.quote(storage.build_uri(file_name))
+            + ' --from-to BlobPipe'
+            + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -96,6 +104,15 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compre
             + storage.build_uri(file_name))
 
 
+@write_file_command.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, file_name: str, compression: Compression = Compression.NONE):
+    if compression not in [Compression.NONE]:
+        raise ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
+    return ('azcopy cp '
+            + shlex.quote(storage.build_uri(file_name))
+            + ' --from-to PipeBlob')
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -136,3 +153,9 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True)
     return ('gsutil rm '
             + ('-f ' if force else '')
             + storage.build_uri(file_name))
+
+
+@delete_file_command.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, file_name: str, force: bool = True):
+    return ('azcopy rm '
+            + shlex.quote(storage.build_uri(file_name)))

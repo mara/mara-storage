@@ -31,7 +31,8 @@ setup(
     extras_require={
         'test': ['pytest'],
         'google-cloud-storage': ['google-cloud-storage',
-                                 'google-oauth']
+                                 'google-oauth'],
+        'azure-blob': ['azure-storage-blob']
     },
     classifiers=[
         'Development Status :: 3 - Alpha',

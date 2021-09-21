@@ -39,6 +39,16 @@ def __(storage: storages.GoogleCloudStorage):
     assert exitcode == 0
 
 
+@ensure_storage.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage):
+    from . import azure
+    client = azure.init_service_client(storage)
+    container_client = client.get_container_client(container=storage.container_name)
+
+    if not container_client.exists():
+        container_client.create_container()
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -88,3 +98,13 @@ def __(storage: storages.GoogleCloudStorage, force: bool = False):
     if exitcode != 0:
         raise Exception(f'An error occured while dropping a GCS bucket. Stdout:\n{stdout}')
     assert exitcode == 0
+
+
+@drop_storage.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, force: bool = False):
+    from . import azure
+    client = azure.init_service_client(storage)
+    container_client = client.get_container_client(container=storage.container_name)
+
+    if container_client.exists():
+        container_client.delete_container()
