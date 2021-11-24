@@ -69,11 +69,13 @@ def __(alias: str, file_name: str, compression: Compression = Compression.NONE):
 
 @write_file_command.register(storages.LocalStorage)
 def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
-    if compression not in [Compression.NONE, Compression.ZIP]:
-        raise ValueError(f'Only compression NONE and ZIP is supported from storage type "{storage.__class__.__name__}"')
+    if compression not in [Compression.NONE, Compression.GZIP, Compression.ZIP]:
+        raise ValueError(f'Only compression NONE, GZIP and ZIP is supported from storage type "{storage.__class__.__name__}"')
 
     full_path = (storage.base_path / file_name).absolute()
-    if compression == Compression.ZIP:
+    if compression == Compression.GZIP:
+        return 'gzip > ' + shlex.quote(str( full_path ))
+    elif compression == Compression.ZIP:
         # the name which shall be used in the zip file
         if full_path.suffix[1:] == file_extension(compression):
             zip_file_name = full_path.stem
