@@ -1,6 +1,7 @@
 import datetime
 import importlib.util
 import subprocess
+import shlex
 import typing as t
 
 from mara_storage import storages
@@ -65,7 +66,9 @@ class GoogleCloudStorageModuleClient(GoogleCloudStorageClient):
 
 class GoogleCloudStorageShellClient(GoogleCloudStorageClient):
     def last_modification_timestamp(self, path: str) -> datetime.datetime:
-        command = (f"gsutil stat {self._storage.build_uri(path)} | \\\n"
+        command = ('gsutil '
+                    + (f'-o Credentials:gs_service_key_file={shlex.quote(self._storage.service_account_file)} ' if self._storage.service_account_file else '')
+                    + f"stat {shlex.quote(self._storage.build_uri(path))} | \\\n"
                     + "grep 'Update time:' | \\\n"
                     + "sed 's/Update time://g' | \\\n"
                     + "sed 's/^[ \\t]*//'")
@@ -81,7 +84,9 @@ class GoogleCloudStorageShellClient(GoogleCloudStorageClient):
         return datetime.datetime.strptime(stdout, '%a, %d %b %Y %H:%M:%S %Z').astimezone()
 
     def iterate_files(self, file_pattern: str) -> t.Iterator[str]:
-        command = (f"gsutil ls {self._storage.build_uri(file_pattern)}")
+        command = ('gsutil '
+                   + (f'-o Credentials:gs_service_key_file={shlex.quote(self._storage.service_account_file)} ' if self._storage.service_account_file else '')
+                   + f"ls {shlex.quote(self._storage.build_uri(file_pattern))}")
         (exitcode, stdout) = subprocess.getstatusoutput(command)
 
         if exitcode != 0:

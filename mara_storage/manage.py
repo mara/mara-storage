@@ -25,10 +25,14 @@ def __(storage: storages.GoogleCloudStorage):
     import subprocess
 
     # command returning 0 when storage exists
-    test_exists_command = f'gsutil -q ls {shlex.quote(storage.base_uri)}'
+    test_exists_command = (f'gsutil -q '
+                            + (f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} ' if storage.service_account_file else '')
+                            + f'ls {shlex.quote(storage.base_uri)}')
 
     # command returning 0 when bucket was created
-    create_storage_command = ('gsutil mb '
+    create_storage_command = ('gsutil '
+                              + (f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} ' if storage.service_account_file else '')
+                              + 'mb '
                               + (f'-l {storage.location}' if storage.location else '')
                               + (f'-p {storage.project_id} ' if storage.project_id else '')
                               + shlex.quote(storage.base_uri))
@@ -81,6 +85,7 @@ def __(storage: storages.GoogleCloudStorage, force: bool = False):
     import subprocess
 
     command = ('gsutil '
+               + (f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} ' if storage.service_account_file else '')
                + ('rm -r ' if force else 'rb -f ')
                + shlex.quote(storage.base_uri))
 

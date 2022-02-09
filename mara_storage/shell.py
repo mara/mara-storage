@@ -38,8 +38,10 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
 
 @read_file_command.register(storages.GoogleCloudStorage)
 def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE):
-    return ('gsutil cat '
-            + storage.build_uri(file_name)
+    return ('gsutil '
+            + f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} '
+            + 'cat '
+            + shlex.quote(storage.build_uri(file_name))
             + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
 
 
@@ -92,10 +94,12 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
 def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE):
     if compression not in [Compression.NONE, Compression.GZIP]:
         raise ValueError(f'Only compression NONE and GZIP is supported from storage type "{storage.__class__.__name__}"')
-    return ('gsutil cp '
+    return ('gsutil '
+            + f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} '
+            + 'cp '
             + ('-Z ' if compression == Compression.GZIP else '')
             + '- '
-            + storage.build_uri(file_name))
+            + shlex.quote(storage.build_uri(file_name)))
 
 
 # -----------------------------------------------------------------------------
@@ -135,6 +139,8 @@ def __(storage: storages.LocalStorage, file_name: str, force: bool = True):
 
 @delete_file_command.register(storages.GoogleCloudStorage)
 def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True):
-    return ('gsutil rm '
+    return ('gsutil '
+            + (f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} ' if storage.service_account_file else '')
+            + 'rm '
             + ('-f ' if force else '')
-            + storage.build_uri(file_name))
+            + shlex.quote(storage.build_uri(file_name)))

@@ -8,7 +8,7 @@ from mara_storage import storages, info, shell, manage
 from mara_storage.google_cloud_storage import GoogleCloudStorageShellClient
 
 
-from .local_config import GCS_PROJECT_ID
+from .local_config import GCS_PROJECT_ID, GCS_SERVICE_ACCOUNT_FILE
 
 TEST_TOUCH_FILE_NAME = 'empty-file.txt'
 
@@ -21,7 +21,7 @@ if not GCS_PROJECT_ID:
 def storage():
     import random
     bucket_name = f'mara_storage_test_{random.randint(0, 2147483647)}'
-    return storages.GoogleCloudStorage(bucket_name=bucket_name, project_id=GCS_PROJECT_ID)
+    return storages.GoogleCloudStorage(bucket_name=bucket_name, project_id=GCS_PROJECT_ID, service_account_file=GCS_SERVICE_ACCOUNT_FILE)
 
 
 @pytest.fixture(autouse=True)
@@ -52,4 +52,9 @@ def test_last_modification_date(storage: object):
     assert last_modification_date
     assert isinstance(last_modification_date, datetime.datetime)
     assert last_modification_date.tzinfo
+
+    print(f'last_modification_date={last_modification_date}')
+    print(f'last_modification_date.tzinfo={last_modification_date.tzinfo}')
+    print(f'datetime.datetime.now().astimezone()={datetime.datetime.now().astimezone()}')
+
     assert (datetime.datetime.now().astimezone() - last_modification_date).total_seconds() <= 10

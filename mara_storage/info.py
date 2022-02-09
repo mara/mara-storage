@@ -26,9 +26,13 @@ def __(storage: storages.LocalStorage, file_name: str):
 @file_exists.register(storages.GoogleCloudStorage)
 def __(storage: storages.GoogleCloudStorage, file_name: str):
     import subprocess
+    import shlex
 
-    command = ('gsutil -q stat '
-               + storage.build_uri(file_name))
+    command = ('gsutil '
+               + (f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} ' if storage.service_account_file else '')
+               + '-q '
+               + 'stat '
+               + shlex.quote(storage.build_uri(file_name)))
 
     (exitcode, _) = subprocess.getstatusoutput(command)
     return exitcode == 0

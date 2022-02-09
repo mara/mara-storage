@@ -6,7 +6,7 @@ from mara_storage.compression import Compression, compressor, file_extension as 
 from mara_storage import storages, info, shell, manage
 
 
-from .local_config import GCS_PROJECT_ID
+from .local_config import GCS_PROJECT_ID, GCS_SERVICE_ACCOUNT_FILE
 
 TEST_READ_FILE_NAME = 'read_test.txt'
 TEST_WRITE_FILE_NAME = 'write_test.txt'
@@ -22,7 +22,7 @@ if not GCS_PROJECT_ID:
 def storage():
     import random
     bucket_name = f'mara_storage_test_{random.randint(0, 2147483647)}'
-    return storages.GoogleCloudStorage(bucket_name=bucket_name, project_id=GCS_PROJECT_ID)
+    return storages.GoogleCloudStorage(bucket_name=bucket_name, project_id=GCS_PROJECT_ID, service_account_file=GCS_SERVICE_ACCOUNT_FILE)
 
 
 @pytest.fixture(autouse=True)
