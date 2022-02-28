@@ -63,7 +63,8 @@ class GoogleCloudStorage(Storage):
         return f"{self.base_uri}/{path}"
 
 class AzureStorage(Storage):
-    def __init__(self, account_name: str, container_name: str, sas: str, storage_type: str = 'blob'):
+    def __init__(self, account_name: str, container_name: str, sas: str = None,
+                 storage_type: str = 'blob', account_key: str = None):
         """
         Connection information for a Azure sstorage bucket
 
@@ -72,8 +73,12 @@ class AzureStorage(Storage):
             container_name: The container name within the storage
             storage_type: The storage type. Supports 'blob' or 'dfs'.
             sas: The SAS token
+            account_key: The storage account key
         """
+        if sas is None and account_key is None:
+            raise ValueError('You have to provide either parameter sas or account_key for type AzureStorage.')
         self.account_name = account_name
+        self.account_key = account_key
         self.container_name = container_name
         self.storage_type = storage_type
         if sas:
@@ -90,6 +95,10 @@ class AzureStorage(Storage):
         return f"{self.base_uri}{path}?{self.sas}"
 
     def connection_string(self):
-        return ('DefaultEndpointsProtocol=https'
-                + f';BlobEndpoint=https://{self.account_name}.{self.storage_type}.core.windows.net'
-                + f';SharedAccessSignature={self.sas}')
+        # see https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string
+        if self.account_key:
+            return f'DefaultEndpointsProtocol=https;AccountName={self.account_name};AccountKey={self.account_key}'
+        else:
+            return ('DefaultEndpointsProtocol=https'
+                    + f';BlobEndpoint=https://{self.account_name}.{self.storage_type}.core.windows.net'
+                    + f';SharedAccessSignature={self.sas}')
