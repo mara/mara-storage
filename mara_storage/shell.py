@@ -136,3 +136,49 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True)
     return ('gsutil rm '
             + ('-f ' if force else '')
             + storage.build_uri(file_name))
+
+
+# -----------------------------------------------------------------------------
+
+
+@singledispatch
+def move_file_command(storage: object, source_file_name: str, target_file_name: str, force: bool = False) -> str:
+    """
+    Creates a shell command that moves a file on a storage to another location.
+
+    Args:
+        storage: The storage where the file is stored
+        source_file_name: The source file name within the storage
+        target_file_name: The target file name within the storage
+        force: If True, the command will override the target_file_name if it already exist.
+               IF False, the shell command will fail when the file already exist.
+
+    Returns:
+        A shell command string
+    """
+    raise NotImplementedError(f'Please implement delete_file_command for type "{storage.__class__.__name__}"')
+
+
+@move_file_command.register(str)
+def __(alias: str, source_file_name: str, target_file_name: str, force: bool = True):
+    return move_file_command(storages.storage(alias), source_file_name=source_file_name, target_file_name=target_file_name, force=force)
+
+
+@move_file_command.register(storages.LocalStorage)
+def __(storage: storages.LocalStorage, source_file_name: str, target_file_name: str, force: bool = True):
+    source_file_path = str( (storage.base_path / source_file_name).absolute() )
+    target_file_path = str( (storage.base_path / target_file_name).absolute() )
+
+    return ((f'[ ! -f {shlex.quote(source_file_path)} ] && ')
+            +'mv '
+            + ('-f ' if force else '')
+            + shlex.quote(source_file_path)
+            + ' '
+            + shlex.quote(target_file_path))
+
+
+#@delete_file_command.register(storages.GoogleCloudStorage)
+#def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True):
+#    return ('gsutil -m mv -p '
+#            + ('-f ' if force else '')
+#            + storage.build_uri(file_name))
