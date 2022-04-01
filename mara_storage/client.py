@@ -7,7 +7,7 @@ from mara_storage import storages
 
 class StorageClient():
     """A base class for a storage client"""
-    def __new__(cls, storage: object):
+    def __new__(cls, storage: t.Union[str, storages.Storage]):
         if storage is None:
             raise ValueError('Please provide the storage prameter')
 
@@ -17,8 +17,11 @@ class StorageClient():
         else:
             return super(StorageClient, cls).__new__(cls)
 
-    def __init__(self, storage: object):
-        self._storage = storage
+    def __init__(self, storage: t.Union[str, storages.Storage]):
+        if isinstance(storage, str):
+            self._storage = storages.storage(storage)
+        else:
+            self._storage = storage
 
     def last_modification_timestamp(self, path: str) -> datetime.datetime:
         """Returns the last modification timestamp for a object (path or file) on a storage"""
