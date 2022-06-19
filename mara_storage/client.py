@@ -29,7 +29,7 @@ class StorageClient():
         Iterates over files on on a storage
 
         Args:
-            file_pattern: the file pattern, e.g. 'subfolder/*.csv'
+            file_pattern: the file pattern, e.g. `'subfolder/*.csv'`
         """
         raise NotImplementedError(f'Please implement iterate_files for type "{self._storage.__class__.__name__}"')
 
