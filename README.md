@@ -7,7 +7,7 @@ Mara Storage
 
 Mini package for configuring and accessing multiple storages in a single project. Decouples the use of storages and their configuration by using "aliases" for storages.
 
-The file [mara_storage/storages.py](mara_storage/storages.py) contains abstract storage configurations for local disk and cloud storages. The storage connections of a project are configured by overwriting the `storages` function in mara_storage/config.py:
+The file [mara_storage/storages.py](https://github.com/mara/mara-storage/blob/main/mara_storage/storages.py) contains abstract storage configurations for local disk and cloud storages. The storage connections of a project are configured by overwriting the `storages` function in mara_storage/config.py:
 
 ``` python
 import pathlib
@@ -32,7 +32,7 @@ This packages gives the possibility to configure, manage and access multile stor
 
 ## Batch processing: Accessing storages with shell commands
 
-The file [mara_storage/shell.py](mara_storage/shell.py) contains functions that create commands for accessing storage files via their command line clients.
+The file [mara_storage/shell.py](https://github.com/mara/mara-storage/blob/main/mara_storage/shell.py) contains functions that create commands for accessing storage files via their command line clients.
    
 For example, the `read_file_command` function creates a shell command that reads a file from a storage and returns its content to stdout:
 
