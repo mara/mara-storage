@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0
+## 1.0.0 (2021-09-18)
 
 - adding support to write piped data in ZIP compression to local storage
 - fix missing extra requirements for Google Cloud Storage

@@ -1,7 +1,7 @@
 import enum
 
 
-class Compression(enum.EnumMeta):
+class Compression(enum.Enum):
     """Different compression formats that are understood by file readers"""
     NONE = 'none'
     GZIP = 'gzip'
@@ -23,7 +23,7 @@ def compressor(compression: Compression) -> str:
     The list of files which shall be compressed must be given after the command.
     The compressed file will be send to stdout
 
-    Sample call:
+    Example:
         command = f'{compressor(Compression.GZIP)} my_file_to_compress.txt > my_compressed_file.txt.gz'
 
     Args:
