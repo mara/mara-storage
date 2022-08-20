@@ -88,9 +88,14 @@ class GoogleCloudStorage(Storage):
 
 class AzureStorage(Storage):
     def __init__(self, account_name: str, container_name: str, sas: str = None,
-                 storage_type: str = 'blob', account_key: str = None):
+                 storage_type: str = 'blob', account_key: str = None,
+                 spa_tenant: str = None, spa_application: str = None, spa_client_secret: str = None):
         """
         Connection information for a Azure sstorage bucket
+
+        Possible authentication methods:
+            SAS => "Shared access signature", see https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview
+            SPA => "Service principal"
 
         Args:
             account_name: The storage account name
@@ -98,15 +103,20 @@ class AzureStorage(Storage):
             storage_type: The storage type. Supports 'blob' or 'dfs'.
             sas: The SAS token
             account_key: The storage account key
+            spa_tenant: The service principal tenant id
+            spa_application: The service principal application id
+            spa_client_secret: The service principal client secret
         """
-        if sas is None and account_key is None:
-            raise ValueError('You have to provide either parameter sas or account_key for type AzureStorage.')
+        if sas is None and account_key is None and spa_client_secret is None:
+            raise ValueError('You have to provide either parameter sas, account_key or spa_client_secret for type AzureStorage.')
         self.account_name = account_name
         self.account_key = account_key
         self.container_name = container_name
         self.storage_type = storage_type
-        if sas:
-            self.sas = sas[1:] if sas.startswith('?') else sas
+        self.sas = (sas[1:] if sas.startswith('?') else sas) if sas else None
+        self.spa_tenant = spa_tenant
+        self.spa_application = spa_application
+        self.spa_client_secret = spa_client_secret
 
     @property
     def base_uri(self):
@@ -116,7 +126,8 @@ class AzureStorage(Storage):
         """Returns a URI for a path on the storage"""
         if path and not path.startswith('/'):
             path = '/' + path
-        return f"{self.base_uri}{path}?{self.sas}"
+        return (f"{self.base_uri}{path}"
+                + (f'?{self.sas}' if self.sas else ''))
 
     def connection_string(self):
         # see https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string
