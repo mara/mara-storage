@@ -27,17 +27,17 @@ def read_file_command(storage: object, file_name: str, compression: Compression 
 
 
 @read_file_command.register(str)
-def __(alias: str, file_name: str, compression: Compression = Compression.NONE):
+def __(alias: str, file_name: str, compression: Compression = Compression.NONE) -> str:
     return read_file_command(storages.storage(alias), file_name=file_name, compression=compression)
 
 
 @read_file_command.register(storages.LocalStorage)
-def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
+def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE) -> str:
     return f'{uncompressor(compression)} '+shlex.quote(str( (storage.base_path / file_name).absolute() ))
 
 
 @read_file_command.register(storages.GoogleCloudStorage)
-def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE):
+def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE) -> str:
     return ('gsutil '
             + f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} '
             + 'cat '
@@ -65,12 +65,12 @@ def write_file_command(storage: object, file_name: str, compression: Compression
 
 
 @write_file_command.register(str)
-def __(alias: str, file_name: str, compression: Compression = Compression.NONE):
+def __(alias: str, file_name: str, compression: Compression = Compression.NONE) -> str:
     return write_file_command(storages.storage(alias), file_name=file_name, compression=compression)
 
 
 @write_file_command.register(storages.LocalStorage)
-def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
+def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE) -> str:
     if compression not in [Compression.NONE, Compression.GZIP, Compression.ZIP]:
         raise ValueError(f'Only compression NONE, GZIP and ZIP is supported from storage type "{storage.__class__.__name__}"')
 
@@ -91,7 +91,7 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
 
 
 @write_file_command.register(storages.GoogleCloudStorage)
-def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE):
+def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE) -> str:
     if compression not in [Compression.NONE, Compression.GZIP]:
         raise ValueError(f'Only compression NONE and GZIP is supported from storage type "{storage.__class__.__name__}"')
     return ('gsutil '
@@ -126,19 +126,19 @@ def delete_file_command(storage: object, file_name: str, force: bool = True) -> 
 
 
 @delete_file_command.register(str)
-def __(alias: str, file_name: str, force: bool = True):
+def __(alias: str, file_name: str, force: bool = True) -> str:
     return delete_file_command(storages.storage(alias), file_name=file_name, force=force)
 
 
 @delete_file_command.register(storages.LocalStorage)
-def __(storage: storages.LocalStorage, file_name: str, force: bool = True):
+def __(storage: storages.LocalStorage, file_name: str, force: bool = True) -> str:
     return ('rm '
             + ('-f ' if force else '')
             + shlex.quote(str( (storage.base_path / file_name).absolute() )))
 
 
 @delete_file_command.register(storages.GoogleCloudStorage)
-def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True):
+def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True) -> str:
     return ('gsutil '
             + (f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} ' if storage.service_account_file else '')
             + 'rm '

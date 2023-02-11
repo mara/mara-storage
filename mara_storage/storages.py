@@ -5,7 +5,7 @@ import pathlib
 
 
 @functools.lru_cache(maxsize=None)
-def storage(alias):
+def storage(alias) -> 'Storage':
     """Returns a storage configuration by alias"""
     from . import config
     storages = config.storages()

@@ -6,7 +6,7 @@ from mara_storage import storages
 
 
 @singledispatch
-def file_exists(storage: object, file_name: str) -> str:
+def file_exists(storage: object, file_name: str) -> bool:
     """
     Check if a file exists on a storage
     """
