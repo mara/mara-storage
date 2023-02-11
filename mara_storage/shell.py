@@ -39,7 +39,7 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
 @read_file_command.register(storages.SftpStorage)
 def __(storage: storages.SftpStorage, file_name: str, compression: Compression = Compression.NONE):
     if compression not in [Compression.NONE]:
-        ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
+        raise ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
     return ('curl -s'
             + (' -k' if storage.insecure else '')
             + (f' -u {storage.user}:' if storage.user else '')
@@ -109,8 +109,8 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
 @write_file_command.register(storages.SftpStorage)
 def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
     if compression not in [Compression.NONE]:
-        ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
-    return ('curl'
+        raise ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
+    return ('curl -s'
             + (' -k' if storage.insecure else '')
             + (f' -u {storage.user}:' if storage.user else '')
             + (f'{storage.password}' if storage.password else '')
