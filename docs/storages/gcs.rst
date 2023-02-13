@@ -6,6 +6,13 @@ Accessing a Google Cloud Storage (GCS) with the shell tool `gsutil`.
 Installation
 ------------
 
+Use extras `google-cloud-storage` to install all required packages.
+
+
+.. code-block:: shell
+
+    $ pip install mara-storage[google-cloud-storage]
+
 You need to install `gsutil`. Take a look at `Install gsutil <https://cloud.google.com/storage/docs/gsutil_install>`_.
 
 

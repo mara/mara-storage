@@ -30,6 +30,7 @@ This section focuses on the supported storages.
 
    storages-overview
    storages/local
+   storages/sftp
    storages/gcs
 
 

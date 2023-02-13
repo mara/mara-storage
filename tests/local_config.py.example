@@ -1,3 +1,13 @@
+# the SFTP storage config used to perform the test
+SFTP_HOST = None
+SFTP_PORT = None
+SFTP_USERNAME = None
+SFTP_PASSWORD = None
+SFTP_INSECURE = False
+SFTP_IDENTITY_FILE = None
+SFTP_PUBLIC_IDENTITY_FILE = None
+
+
 # the Google Cloud project id used to perform the test
 GCS_PROJECT_ID = ''
 

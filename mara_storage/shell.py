@@ -36,6 +36,22 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
     return f'{uncompressor(compression)} '+shlex.quote(str( (storage.base_path / file_name).absolute() ))
 
 
+@read_file_command.register(storages.SftpStorage)
+def __(storage: storages.SftpStorage, file_name: str, compression: Compression = Compression.NONE):
+    if compression not in [Compression.NONE]:
+        raise ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
+    return ('curl -s'
+            + (' -k' if storage.insecure else '')
+            + (f' -u {storage.user}:' if storage.user else '')
+            + (f'{storage.password}' if storage.user and storage.password else '')
+            + (f' --key {storage.identity_file}' if storage.identity_file else '')
+            + (f' --pubkey {storage.public_identity_file}' if storage.public_identity_file else '')
+            + f' sftp://{storage.host}'
+            + (f':{storage.port}' if storage.port else '')
+            + f'/{shlex.quote(file_name)}'
+            + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
+
+
 @read_file_command.register(storages.GoogleCloudStorage)
 def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE) -> str:
     return ('gsutil '
@@ -90,6 +106,23 @@ def __(storage: storages.LocalStorage, file_name: str, compression: Compression 
         return 'cat - > ' + shlex.quote(str( full_path ))
 
 
+@write_file_command.register(storages.SftpStorage)
+def __(storage: storages.LocalStorage, file_name: str, compression: Compression = Compression.NONE):
+    if compression not in [Compression.NONE]:
+        raise ValueError(f'Only compression NONE is supported from storage type "{storage.__class__.__name__}"')
+    return ('curl -s'
+            + (' -k' if storage.insecure else '')
+            + (f' -u {storage.user}:' if storage.user else '')
+            + (f'{storage.password}' if storage.password else '')
+            + (f' --key {storage.identity_file}' if storage.identity_file else '')
+            + (f' --pubkey {storage.public_identity_file}' if storage.public_identity_file else '')
+            + ' -T'
+            + ' -' # source
+            + f' sftp://{storage.host}' # destination
+            + (f':{storage.port}' if storage.port else '')
+            + f'/{shlex.quote(file_name)}')
+
+
 @write_file_command.register(storages.GoogleCloudStorage)
 def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compression = Compression.NONE) -> str:
     if compression not in [Compression.NONE, Compression.GZIP]:
@@ -135,6 +168,22 @@ def __(storage: storages.LocalStorage, file_name: str, force: bool = True) -> st
     return ('rm '
             + ('-f ' if force else '')
             + shlex.quote(str( (storage.base_path / file_name).absolute() )))
+
+
+@delete_file_command.register(storages.SftpStorage)
+def __(storage: storages.SftpStorage, file_name: str, force: bool = True):
+    if not force:
+        ValueError(f'Only force=True is supported from storage type "{storage.__class__.__name__}"')
+
+    return ((f'sshpass -p {storage.password} ' if storage.password else '')
+            + 'sftp'
+            + (' -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' if storage.insecure else '')
+            + (f' {storage.user}@' if storage.user else '')
+            + storage.host
+            + (f':{storage.port}' if storage.port else '')
+            + (f' -i {storage.identity_file}' if storage.identity_file else '')
+            + (f' << EOF\nrm {shlex.quote(file_name)}\nquit\nEOF')
+            )
 
 
 @delete_file_command.register(storages.GoogleCloudStorage)

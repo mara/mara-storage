@@ -76,9 +76,10 @@ print(mara_storage.shell.delete_file_command('data', file_name='hello-world.txt'
 
 The following **command line clients** are used to access the various databases:
 
-| Database | Client binary | Comments |  
+| Storage | Client binary | Comments |  
 | --- | --- | --- |
 | Local storage | unix shell | Included in standard distributions. |
+| SFTP storage | `sftp`, `curl` |  |
 | Google Cloud Storage | `gsutil` | From [https://cloud.google.com/storage/docs/gsutil_install](https://cloud.google.com/storage/docs/gsutil_install). |
 
 &nbsp;
