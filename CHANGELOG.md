@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 (2023-02-22)
+
+- :tada: *feat* add pyproject.toml
+- :tada: *feat* add support to write to a local storage with GZIP compression
+- :tada: *feat* Add support for SFTP (#10)
+- :tada: *feat* support recursive deletion (#15)
+- :tada: *feat* Add azure storage support (#11)
+- :rocket: *change* use `gsutil` with key file + always usie shell-quote for gsuil URIs
+- :bug: *fix* support initializing the StorageClient from storage alias
+
 ## 1.0.0 (2021-09-18)
 
 - adding support to write piped data in ZIP compression to local storage
