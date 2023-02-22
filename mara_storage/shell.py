@@ -61,6 +61,24 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compre
             + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
 
 
+@read_file_command.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, file_name: str, compression: Compression = Compression.NONE):
+    if storage.sas:
+        return (f'curl -sf {shlex.quote(storage.build_uri(path=file_name))}'
+                + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
+
+    azlogin_env = ('AZCOPY_AUTO_LOGIN_TYPE=SPN '
+                   + f'AZCOPY_TENANT_ID="{storage.spa_tenant}" '
+                   + f'AZCOPY_SPA_APPLICATION_ID="{storage.spa_application}" '
+                   + f'AZCOPY_SPA_CLIENT_SECRET="{storage.spa_client_secret}" '
+                   ) if not storage.sas else ''
+
+    return (f'{azlogin_env}azcopy cp '
+            + shlex.quote(storage.build_uri(file_name))
+            + ' --from-to BlobPipe'
+            + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -135,6 +153,23 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compre
             + shlex.quote(storage.build_uri(file_name)))
 
 
+@write_file_command.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, file_name: str, compression: Compression = Compression.NONE):
+    if compression not in [Compression.NONE, Compression.GZIP]:
+        raise ValueError(f'Only compression NONE and GZIP is supported from storage type "{storage.__class__.__name__}"')
+
+    azlogin_env = ('AZCOPY_AUTO_LOGIN_TYPE=SPN '
+                   + f'AZCOPY_TENANT_ID="{storage.spa_tenant}" '
+                   + f'AZCOPY_SPA_APPLICATION_ID="{storage.spa_application}" '
+                   + f'AZCOPY_SPA_CLIENT_SECRET="{storage.spa_client_secret}" '
+                   ) if not storage.sas else ''
+
+    return ((f'gzip \\\n  | ' if compression == Compression.GZIP else '')
+            + f'{azlogin_env}azcopy cp '
+            + shlex.quote(storage.build_uri(file_name))
+            + ' --from-to PipeBlob')
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -202,3 +237,19 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True,
             + ('-f ' if force else '')
             + ('-r ' if recursive else '')
             + shlex.quote(storage.build_uri(file_name)))
+
+
+@delete_file_command.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, file_name: str, force: bool = True, recursive: bool = False):
+    if storage.sas and not force and not recursive:
+        return (f'curl -sf -X DELETE {shlex.quote(storage.build_uri(path=file_name))}')
+
+    azlogin_env = ('AZCOPY_AUTO_LOGIN_TYPE=SPN '
+                   + f'AZCOPY_TENANT_ID="{storage.spa_tenant}" '
+                   + f'AZCOPY_SPA_APPLICATION_ID="{storage.spa_application}" '
+                   + f'AZCOPY_SPA_CLIENT_SECRET="{storage.spa_client_secret}" '
+                   ) if not storage.sas else ''
+
+    return (f'{azlogin_env}azcopy rm '
+            + shlex.quote(storage.build_uri(file_name))
+            + (' --recursive=true' if recursive else ''))

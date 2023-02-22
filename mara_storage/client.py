@@ -55,3 +55,8 @@ def __(storage: storages.LocalStorage):
 def __(storage: storages.GoogleCloudStorage):
     from .google_cloud_storage import GoogleCloudStorageClient
     return GoogleCloudStorageClient
+
+@storage_client_type.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage):
+    from .azure import AzureStorageClient
+    return AzureStorageClient
