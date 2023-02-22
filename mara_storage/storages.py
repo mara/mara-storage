@@ -44,8 +44,10 @@ class SftpStorage(Storage):
             user: username
             password: password
             insecure: if True, the known_hosts file will not be checked
-            identity_file: path to a private key file to be used for private/public key authentication
-            public_identity_file: path to a public key file to be used for private/public key authentication
+            identity_file: path to a private key file to be used for private/public key
+                           authentication
+            public_identity_file: path to a public key file to be used for
+                                  private/public key authentication
         """
         self.host = host
         self.port = port
@@ -66,10 +68,11 @@ class GoogleCloudStorage(Storage):
             bucket_name: name of the GCS bucket
             project_id: Google Cloud project ID for new buckets
             location: Default geographic location to use when creating buckets
-            service_account_file: The name of the private key file provided by Google when creating
-                                  a service account. (it's a JSON file).
-            service_account_info: The (parsed JSON) content of a service account file (use when you
-                                  don't want to provide a `service_account_file`)
+            service_account_file: The name of the private key file provided by Google
+                                  when creating a service account. (it's a JSON file).
+            service_account_info: The (parsed JSON) content of a service account file
+                                  (use when you don't want to provide a
+                                  `service_account_file`)
         """
         self.bucket_name = bucket_name
         self.project_id = project_id

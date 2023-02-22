@@ -41,7 +41,10 @@ def compressor(compression: Compression) -> str:
 
 
 def uncompressor(compression: Compression) -> str:
-    """Maps compression methods to command line programs that can unpack the respective files"""
+    """
+    Maps compression methods to command line programs that can unpack the respective
+    files
+    """
     return {Compression.NONE: 'cat',
             Compression.ZIP: 'unzip -p',
             Compression.GZIP: 'gunzip -d -c',
