@@ -240,8 +240,8 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True,
 
 
 @delete_file_command.register(storages.AzureStorage)
-def __(storage: storages.AzureStorage, file_name: str, force: bool = True):
-    if storage.sas and not force:
+def __(storage: storages.AzureStorage, file_name: str, force: bool = True, recursive: bool = False):
+    if storage.sas and not force and not recursive:
         return (f'curl -sf -X DELETE {shlex.quote(storage.build_uri(path=file_name))}')
 
     azlogin_env = ('AZCOPY_AUTO_LOGIN_TYPE=SPN '
@@ -251,4 +251,5 @@ def __(storage: storages.AzureStorage, file_name: str, force: bool = True):
                    ) if not storage.sas else ''
 
     return (f'{azlogin_env}azcopy rm '
-            + shlex.quote(storage.build_uri(file_name)))
+            + shlex.quote(storage.build_uri(file_name))
+            + (' --recursive=true' if recursive else ''))
