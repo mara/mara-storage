@@ -139,7 +139,7 @@ def __(storage: storages.GoogleCloudStorage, file_name: str, compression: Compre
 
 
 @singledispatch
-def delete_file_command(storage: object, file_name: str, force: bool = True) -> str:
+def delete_file_command(storage: object, file_name: str, force: bool = True, recursive: bool = False) -> str:
     """
     Creates a shell command that deletes a file on a storage
 
@@ -151,6 +151,7 @@ def delete_file_command(storage: object, file_name: str, force: bool = True) -> 
         file_name: The file name within the storage
         force: If True, the command will silently end without error (exit code 0)
                when the file does not exist
+        recursive: The folder with content will be deleted
 
     Returns:
         A shell command string
@@ -159,19 +160,25 @@ def delete_file_command(storage: object, file_name: str, force: bool = True) -> 
 
 
 @delete_file_command.register(str)
-def __(alias: str, file_name: str, force: bool = True) -> str:
-    return delete_file_command(storages.storage(alias), file_name=file_name, force=force)
+def __(alias: str, file_name: str, force: bool = True, recursive: bool = False) -> str:
+    return delete_file_command(storages.storage(alias), file_name=file_name, force=force, recursive=recursive)
 
 
 @delete_file_command.register(storages.LocalStorage)
-def __(storage: storages.LocalStorage, file_name: str, force: bool = True) -> str:
+def __(storage: storages.LocalStorage, file_name: str, force: bool = True, recursive: bool = False) -> str:
+    options = ''
+    if force:
+        options += 'f'
+    if recursive:
+        options += 'r'
+
     return ('rm '
-            + ('-f ' if force else '')
+            + (f'-{options} ' if options else '')
             + shlex.quote(str( (storage.base_path / file_name).absolute() )))
 
 
 @delete_file_command.register(storages.SftpStorage)
-def __(storage: storages.SftpStorage, file_name: str, force: bool = True):
+def __(storage: storages.SftpStorage, file_name: str, force: bool = True, recursive: bool = False):
     if not force:
         ValueError(f'Only force=True is supported from storage type "{storage.__class__.__name__}"')
 
@@ -182,14 +189,16 @@ def __(storage: storages.SftpStorage, file_name: str, force: bool = True):
             + storage.host
             + (f':{storage.port}' if storage.port else '')
             + (f' -i {storage.identity_file}' if storage.identity_file else '')
-            + (f' << EOF\nrm {shlex.quote(file_name)}\nquit\nEOF')
-            )
+            + f' << EOF\nrm '
+            + ('-r ' if recursive else '')
+            + f'{shlex.quote(file_name)}\nquit\nEOF')
 
 
 @delete_file_command.register(storages.GoogleCloudStorage)
-def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True) -> str:
+def __(storage: storages.GoogleCloudStorage, file_name: str, force: bool = True, recursive: bool = False) -> str:
     return ('gsutil '
             + (f'-o Credentials:gs_service_key_file={shlex.quote(storage.service_account_file)} ' if storage.service_account_file else '')
             + 'rm '
             + ('-f ' if force else '')
+            + ('-r ' if recursive else '')
             + shlex.quote(storage.build_uri(file_name)))
