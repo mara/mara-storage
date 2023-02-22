@@ -29,9 +29,10 @@ This section focuses on the supported storages.
    :maxdepth: 2
 
    storages-overview
+   storages/azure
+   storages/gcs
    storages/local
    storages/sftp
-   storages/gcs
 
 
 API Reference

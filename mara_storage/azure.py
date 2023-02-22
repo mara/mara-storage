@@ -14,6 +14,7 @@ def init_service_client(storage: storages.AzureStorage, path: str = None) -> Blo
     client = BlobServiceClient.from_connection_string(storage.connection_string())
     return client
 
+
 class AzureStorageClient(StorageClient):
     def __init__(self, storage: storages.AzureStorage):
         super().__init__(storage)

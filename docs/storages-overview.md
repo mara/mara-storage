@@ -3,12 +3,16 @@ Overview
 
 The following storages are supported
 
-| Storage                | Configuration class | 
-| ---------------------- | ------------------- | 
-| Local bash             | LocalStorage        | 
-| [Google Cloud Storage] | GoogleCloudStorage  | 
+| Storage                   | Configuration class |
+| ------------------------- | ------------------- |
+| Local bash                | LocalStorage        |
+| [Google Cloud Storage]    | GoogleCloudStorage  |
+| [Azure Blob Storage]      | AzureStorage        |
+| [Azure Data Lake Storage] | AzureStorage        |
 
 [Google Cloud Storage]: https://cloud.google.com/storage
+[Azure Blob Storage]: https://azure.microsoft.com/en-us/products/storage/blobs
+[Azure Data Lake Storage]: https://azure.microsoft.com/en-us/products/storage/data-lake-storage/
 
 
 Function support matrix
@@ -18,6 +22,7 @@ Function support matrix
 | --------------------- | ---- | ----- | ------ | ------ |
 | LocalStorage          | Yes  | Yes   | Yes    | Yes
 | GoogleCloudStorage    | Yes  | Yes   | Yes    | Yes
+| AzureStorage          | Yes  | Yes   | Yes    | Yes
 
 ```{note}
 A `Move` operation is not implemented by design. Most of the blob storages do not
