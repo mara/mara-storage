@@ -81,7 +81,7 @@ The following **command line clients** are used to access the various databases:
 | Local storage | unix shell | Included in standard distributions. |
 | SFTP storage | `sftp`, `curl` |  |
 | Google Cloud Storage | `gsutil` | From [https://cloud.google.com/storage/docs/gsutil_install](https://cloud.google.com/storage/docs/gsutil_install). |
-| Azure Storage | `azcopy` | From [https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10)
+| Azure Storage | `azcopy`, `curl` | From [https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10)
 
 &nbsp;
 

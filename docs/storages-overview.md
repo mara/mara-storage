@@ -9,6 +9,7 @@ The following storages are supported
 | [Google Cloud Storage]    | GoogleCloudStorage  |
 | [Azure Blob Storage]      | AzureStorage        |
 | [Azure Data Lake Storage] | AzureStorage        |
+| SFTP                      | SftpStorage         |
 
 [Google Cloud Storage]: https://cloud.google.com/storage
 [Azure Blob Storage]: https://azure.microsoft.com/en-us/products/storage/blobs
@@ -20,9 +21,10 @@ Function support matrix
 
 | Configuration class   | Read | Write | Delete | Client |
 | --------------------- | ---- | ----- | ------ | ------ |
-| LocalStorage          | Yes  | Yes   | Yes    | Yes
-| GoogleCloudStorage    | Yes  | Yes   | Yes    | Yes
-| AzureStorage          | Yes  | Yes   | Yes    | Yes
+| LocalStorage          | Yes  | Yes   | Yes    | Yes    |
+| GoogleCloudStorage    | Yes  | Yes   | Yes    | Yes    |
+| AzureStorage          | Yes  | Yes   | Yes    | Yes    |
+| SftpStorage           | Yes  | Yes   | Yes    | No     |
 
 ```{note}
 A `Move` operation is not implemented by design. Most of the blob storages do not
