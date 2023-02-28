@@ -215,7 +215,7 @@ def __(storage: storages.LocalStorage, file_name: str, force: bool = True, recur
 @delete_file_command.register(storages.SftpStorage)
 def __(storage: storages.SftpStorage, file_name: str, force: bool = True, recursive: bool = False):
     if not force:
-        ValueError(f'Only force=True is supported from storage type "{storage.__class__.__name__}"')
+        raise ValueError(f'Only force=True is supported from storage type "{storage.__class__.__name__}"')
 
     return ((f'sshpass -p {storage.password} ' if storage.password else '')
             + 'sftp'
