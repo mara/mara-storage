@@ -50,7 +50,7 @@ class AzureStorageClient(StorageClient):
 
     def iterate_files(self, file_pattern: str):
         blobs = self._container_client.list_blobs(name_starts_with=file_pattern)
-        
+
         for blob in blobs:
             if blob:
                 yield blob.name

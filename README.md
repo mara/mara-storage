@@ -34,7 +34,7 @@ This packages gives the possibility to configure, manage and access multile stor
 ## Batch processing: Accessing storages with shell commands
 
 The file [mara_storage/shell.py](https://github.com/mara/mara-storage/blob/main/mara_storage/shell.py) contains functions that create commands for accessing storage files via their command line clients.
-   
+
 For example, the `read_file_command` function creates a shell command that reads a file from a storage and returns its content to stdout:
 
 ```python
@@ -76,7 +76,7 @@ print(mara_storage.shell.delete_file_command('data', file_name='hello-world.txt'
 
 The following **command line clients** are used to access the various databases:
 
-| Storage | Client binary | Comments |  
+| Storage | Client binary | Comments |
 | --- | --- | --- |
 | Local storage | unix shell | Included in standard distributions. |
 | SFTP storage | `sftp`, `curl` |  |
