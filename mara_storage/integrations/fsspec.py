@@ -13,7 +13,7 @@ def filesystem(storage: Union[str, storages.Storage], **storage_options) -> Abst
 
     Args:
         db: the storage as alias or class
-        **kargs: additional arguments to be passed to the 
+        **kargs: additional arguments to be passed to the
     """
     raise NotImplementedError(f'Please implement filesystem for type "{storage.__class__.__name__}"')
 
@@ -49,6 +49,17 @@ def __(storage: storages.GoogleCloudStorage, **kargs):
                              default_location=kargs.pop('default_location', storage.location),
                              **kargs)
 
+
+@filesystem.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, **kargs):
+    return fsspec.filesystem('adl' if storage.storage_type == 'dfs' else 'az',
+                             account_name=kargs.pop('account_name', storage.account_name),
+                             account_key=kargs.pop('account_key', storage.account_key),
+                             sas_token=kargs.pop('sas_token', storage.sas),
+                             tenant_id=kargs.pop('tenant_id', storage.spa_tenant),
+                             client_id=kargs.pop('client_id', storage.spa_application),
+                             client_secret=kargs.pop('client_secret', storage.spa_client_secret),
+                             **kargs)
 
 
 @singledispatch
@@ -87,3 +98,8 @@ def __(storage: storages.GoogleCloudStorage, path: str):
 @build_path.register(storages.SftpStorage)
 def __(storage: storages.SftpStorage, path: str):
     return path
+
+
+@build_path.register(storages.AzureStorage)
+def __(storage: storages.AzureStorage, path: str):
+    return f"{storage.container_name}/{path}"
