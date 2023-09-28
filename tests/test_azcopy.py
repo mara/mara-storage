@@ -4,7 +4,7 @@ import subprocess
 from mara_storage import storages, info, shell, manage
 
 
-from .local_config import AZ_STORAGE_ACCOUNT_NAME, AZ_STORAGE_TYPE, AZ_STORAGE_SAS
+from .local_config import AZ_STORAGE_ACCOUNT_NAME, AZ_STORAGE_ACCOUNT_KEY, AZ_STORAGE_TYPE, AZ_STORAGE_SAS
 
 TEST_TOUCH_FILE_NAME = 'empty-file.txt'
 TEST_FILE_NOT_EXISTS_FILE_NAME = 'file-does-not-exist.txt'
@@ -25,6 +25,7 @@ def storage():
 
     return storages.AzureStorage(
         account_name=AZ_STORAGE_ACCOUNT_NAME,
+        account_key=AZ_STORAGE_ACCOUNT_KEY,
         container_name=container_name,
         sas=AZ_STORAGE_SAS,
         storage_type=AZ_STORAGE_TYPE)

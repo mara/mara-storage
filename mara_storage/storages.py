@@ -89,6 +89,7 @@ class GoogleCloudStorage(Storage):
         """Returns a URI for a path on the storage"""
         return f"{self.base_uri}/{path}"
 
+
 class AzureStorage(Storage):
     def __init__(self, account_name: str, container_name: str, sas: str = None,
                  storage_type: str = 'blob', account_key: str = None,
@@ -123,13 +124,16 @@ class AzureStorage(Storage):
 
     @property
     def base_uri(self):
-        return f'https://{self.account_name}.{self.storage_type}.core.windows.net/{self.container_name}'
+        return self.build_base_uri()
 
-    def build_uri(self, path: str):
+    def build_base_uri(self, storage_type: str = None):
+        return f'https://{self.account_name}.{storage_type or self.storage_type}.core.windows.net/{self.container_name}'
+
+    def build_uri(self, path: str = None, storage_type: str = None):
         """Returns a URI for a path on the storage"""
         if path and not path.startswith('/'):
             path = '/' + path
-        return (f"{self.base_uri}{path}"
+        return (f"{self.build_base_uri(storage_type)}{path}"
                 + (f'?{self.sas}' if self.sas else ''))
 
     def connection_string(self):

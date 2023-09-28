@@ -74,7 +74,7 @@ def __(storage: storages.AzureStorage, file_name: str, compression: Compression 
                    ) if not storage.sas else ''
 
     return (f'{azlogin_env}azcopy cp '
-            + shlex.quote(storage.build_uri(file_name))
+            + shlex.quote(storage.build_uri(file_name, storage_type='blob'))
             + ' --from-to BlobPipe'
             + (f'\\\n  | {uncompressor(compression)} - ' if compression != Compression.NONE else ''))
 
@@ -166,7 +166,7 @@ def __(storage: storages.AzureStorage, file_name: str, compression: Compression 
 
     return ((f'gzip \\\n  | ' if compression == Compression.GZIP else '')
             + f'{azlogin_env}azcopy cp '
-            + shlex.quote(storage.build_uri(file_name))
+            + shlex.quote(storage.build_uri(file_name, storage_type='blob'))
             + ' --from-to PipeBlob')
 
 
@@ -251,5 +251,5 @@ def __(storage: storages.AzureStorage, file_name: str, force: bool = True, recur
                    ) if not storage.sas else ''
 
     return (f'{azlogin_env}azcopy rm '
-            + shlex.quote(storage.build_uri(file_name))
+            + shlex.quote(storage.build_uri(file_name, storage_type='blob'))
             + (' --recursive=true' if recursive else ''))
