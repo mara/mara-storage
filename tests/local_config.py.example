@@ -17,5 +17,6 @@ GCS_SERVICE_ACCOUNT_FILE = ''
 
 # the Azure Storage config used to perform the test
 AZ_STORAGE_ACCOUNT_NAME = ''
+AZ_STORAGE_ACCOUNT_KEY = None
 AZ_STORAGE_TYPE = 'blob'
-AZ_STORAGE_SAS = None
+AZ_STORAGE_SAS = None  # SAS Token must have access to the whole storage with permissions to create a container
