@@ -94,12 +94,6 @@ To use the library directly, use pip:
 pip install mara-storage
 ```
 
-or
-
-```
-pip install git+https://github.com/mara/mara-storage.git
-```
-
 ## Links
 
 * Documentation: https://mara-storage.readthedocs.io/
