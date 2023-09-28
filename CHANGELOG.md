@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 (2023-09-28)
+
+- :bug: *fix* Azure Storage: run `azcopy` only with storage_type BLOB (#17)
+- :bug: fix exceptions without raise keyword (#16)
+
 ## 1.1.0 (2023-02-22)
 
 - :tada: *feat* add pyproject.toml
